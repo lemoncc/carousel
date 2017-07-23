@@ -1,0 +1,158 @@
+<!doctype html>
+    <html>
+<head>
+    <meta charset="utf-8"/>
+    <title>carousel</title>
+    <style>
+        #carousel{
+            margin:10px;
+            width:670px;
+            height:240px;
+            overflow:hidden;
+            position:relative;
+        }
+        .imgs{
+            height:240px;
+            position:absolute;
+            left:0;
+            top:0;
+
+        }
+        .imgs li{
+            float:left;
+        }
+        .indexs{
+            position:absolute;
+            bottom:20px;
+            right:30px;
+
+        }
+        .indexs li{
+            float:left;
+            width:20px;
+            height:20px;
+            border-radius:50%;
+            color:#fff;
+            background:#0055A5;
+            margin:0 5px;
+            text-align:center;
+            line-height:20px;
+        }
+        .indexs li:hover,.indexs li.hover{
+            background:red;
+        }
+        ul{
+            margin:0;
+            padding:0;
+            list-style:none;
+        }
+        img{
+            vertical-align:bottom;
+        }
+    </style>
+</head>
+<body>
+    <div id="carousel">
+        <ul class="imgs">
+        </ul>
+        <ul class="indexs">
+        </ul>
+    </div>
+</body>
+<script src="jquery-1.11.3.js"></script>
+<script>
+    var imgs=[
+        {"i":0,"img":"banner_01.jpg"},
+        {"i":1,"img":"banner_02.jpg"},
+        {"i":2,"img":"banner_03.jpg"},
+        {"i":3,"img":"banner_04.jpg"},
+        {"i":4,"img":"banner_05.jpg"}
+    ]
+    var adv={
+        LIWIDTH:0,
+        IMGSUL:null,
+        WAIT:3000,
+        INTERVAL:1000,
+        TIMER:null,
+        init(){
+            this.LIWIDTH=parseFloat($("#carousel").css("width"));
+            this.IMGSUL=$(".imgs");
+            this.IMGSUL.css("width",imgs.length*this.LIWIDTH);
+            this.updataView();
+            $(".indexs").on("mouseover","li",(e)=>{
+                var target=$(".indexs>li").index(e.target);
+                var old=imgs[0].i;
+                this.move(target-old);
+            });
+            this.autoMove();
+        },
+        autoMove(){
+            this.TIMER=setTimeout(
+                ()=>this.move(1),this.WAIT
+            )
+        },
+        prevMove(n){
+            n*=-1;
+            imgs=imgs.splice(-n,n).concat(imgs);
+            this.updataView();
+            this.IMGSUL.css("left",-this.LIWIDTH*n);
+        },
+        move(n){
+            clearTimeout(this.TIMER);
+            if(n<0){
+                this.prevMove(n);
+                this.IMGSUL.stop(true).animate(
+                    {left:0},
+                    this.INTERVAL,
+                    ()=>this.autoMove()
+                )
+            }else{
+                this.IMGSUL.stop(true).animate(
+                    {left:-n*this.LIWIDTH},
+                    this.INTERVAL,
+                    ()=>this.moveCallback(n)
+                )
+            }
+        },
+        moveCallback(n){
+            imgs=imgs.concat(imgs.splice(0,n));
+            this.updataView();
+            this.IMGSUL.css("left",0);
+            this.autoMove();
+        },
+        updataView(){
+            for(var i= 0,ad="",idxs="";i<imgs.length;i++){
+                ad+=`<li><img src=${imgs[i].img}></li>`;
+                idxs+=`<li>${i+1}</li>`;
+            }
+            this.IMGSUL.html(ad);
+            $(".indexs").html(idxs).children(`li:eq(${imgs[0].i})`).addClass("hover");
+        }
+
+
+    }
+    adv.init();
+</script>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
